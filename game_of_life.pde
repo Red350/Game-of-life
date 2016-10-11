@@ -16,18 +16,17 @@ void setup()
 
   randomise();  // initialise board1
   //board_cur[50][50] = true;
-  //board_cur[50][51] = true;
+  //board_cur[50][51] = truqe;
   //board_cur[50][52] = true;
   //board_cur[51][50] = true;
   //board_cur[49][51] = true;
-  
+
   // copy into board2
   arrCopy(board_prev, board_cur);
   //for (int i = 0; i < board1.length; i++)
   //{
   //  board2[i] = board1[i].clone();
   //}
-  
 }
 
 float cellWidth;
@@ -38,57 +37,82 @@ int colCount = 100;
 boolean[][] board_cur = new boolean[rowCount][colCount];
 boolean[][] board_prev = new boolean[rowCount][colCount];
 
+boolean pause = false;
+
 void draw()
 {
-  // update the board
-  for (int i = 0; i < rowCount; i++)
+  println("loop");
+  if (!pause)
   {
-    for (int j = 0; j < colCount; j++)
+    // update the board
+    for (int i = 0; i < rowCount; i++)
     {
-      int numAlive = countLiveCells(i,j);
-      // if cell is alive
-      if (getCell(i,j))
+      for (int j = 0; j < colCount; j++)
       {
-        if (numAlive < 2 || numAlive > 3)
+        int numAlive = countLiveCells(i, j);
+        // if cell is alive
+        if (getCell(i, j))
         {
-          setCell(i,j,false);
-        }
-      }
-      else
-      {
-        if (numAlive == 3)
+          if (numAlive < 2 || numAlive > 3)
+          {
+            setCell(i, j, false);
+          }
+        } else
         {
-          setCell(i,j,true);
+          if (numAlive == 3)
+          {
+            setCell(i, j, true);
+          }
         }
       }
     }
-  }
-  
-  // update the previous version to be the same as the current
-  arrCopy(board_prev, board_cur);
-  // draw the board
-  background(0);
-  for (int i = 0; i < rowCount; i++)
-  {
-    for (int j = 0; j < colCount; j++)
-    {
-      if (getCell(i, j) == true)
-      {
-        fill(0, 255, 0);
-        rect(i * cellWidth, j * cellHeight, cellWidth, cellHeight);
-      } else
-      {
-        fill(0, 0, 0);
-        rect(i * cellWidth, j * cellHeight, cellWidth, cellHeight);
-      }
-    }
-  }
 
-  // flip the board pointers
-  boolean[][] temp;
-  temp = board_cur;
-  board_cur = board_prev;
-  board_prev = temp;
+    // update the previous version to be the same as the current
+    arrCopy(board_prev, board_cur);
+    // draw the board
+    background(0);
+    for (int i = 0; i < rowCount; i++)
+    {
+      for (int j = 0; j < colCount; j++)
+      {
+        if (getCell(i, j) == true)
+        {
+          fill(0, 255, 0);
+          rect(i * cellWidth, j * cellHeight, cellWidth, cellHeight);
+        } else
+        {
+          fill(0, 0, 0);
+          rect(i * cellWidth, j * cellHeight, cellWidth, cellHeight);
+        }
+      }
+    }
+
+    // flip the board pointers
+    boolean[][] temp;
+    temp = board_cur;
+    board_cur = board_prev;
+    board_prev = temp;
+  }
+}
+
+void keyPressed()
+{
+  switch(key)
+  {
+  case 'p':
+    pause = !pause;
+    break;
+  case 'r':
+    randomise();
+    break;
+  case 'c':
+    clear();
+    break;
+  }
+}
+
+void mousePressed()
+{
 }
 
 // updates the cells in the current version of the board
@@ -146,9 +170,11 @@ void randomise()
       if ((int)random(0, 2) == 1)
       {
         board_cur[i][j] = true;
+        board_prev[i][j] = true;
       } else
       {
         board_cur[i][j] = false;
+        board_prev[i][j] = false;
       }
     }
   }
@@ -161,6 +187,18 @@ void arrCopy(boolean[][] dest, boolean[][] src)
     for (int j = 0; j < dest[0].length; j++)
     {
       dest[i][j] = src[i][j];
+    }
+  }
+}
+
+void clear()
+{
+  for (int i = 0; i < board_prev.length; i++)
+  {
+    for (int j = 0; j < board_prev.length; j++)
+    {
+      board_prev[i][j] = false;
+      board_cur[i][j] = false;
     }
   }
 }
