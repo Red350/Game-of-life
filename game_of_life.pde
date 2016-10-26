@@ -1,3 +1,9 @@
+// Game of life implementation
+// Controls:
+//   clear screen:     <c>
+//   randomise cells:  <r>
+//   pause simulation: <p>
+
 void setup()
 {
   size(800, 800);
@@ -7,7 +13,9 @@ void setup()
   strokeWeight(0.1);
   frameRate(60);
 
-  //randomise();  // initialise board1
+  //randomise();  // initialise board1 in a random state
+  
+  // Initialise a simple pattern
   board_cur[50][50] = true;
   board_cur[50][51] = true;
   board_cur[50][52] = true;
@@ -81,6 +89,7 @@ void draw()
   arrCopy(board_prev, board_cur);
 }
 
+// Call functions based on the key a user presses
 void keyPressed()
 {
   switch(key)
@@ -95,10 +104,6 @@ void keyPressed()
     clear();
     break;
   }
-}
-
-void mousePressed()
-{
 }
 
 // updates the cells in the current version of the board
@@ -123,6 +128,7 @@ boolean getCell(int row, int col)
   }
 }
 
+// Count the number of live cells that surround a particular cell
 int countLiveCells(int row, int col)
 {
   int count = 0;
@@ -166,6 +172,7 @@ void randomise()
   }
 }
 
+// copy contents of one 2d array into another
 void arrCopy(boolean[][] dest, boolean[][] src)
 {
   for (int i = 0; i < dest.length; i++)
