@@ -5,29 +5,17 @@ void setup()
   cellHeight = height / (float)rowCount;
   stroke(255);
   strokeWeight(0.1);
-  frameRate(5);
-  // test for out of bounds
-  //toggle(0, 0);
-  //toggle(-1, 0);
-  //toggle(0, -1);
-  //toggle(99, 99);
-  //toggle(100, 99);
-  //toggle(99, 100);
+  frameRate(60);
 
-  randomise();  // initialise board1
-  //board_cur[50][50] = true;
-  //board_cur[50][51] = true;
-  //board_cur[50][52] = true;
-  //board_cur[51][50] = true;
-  //board_cur[49][51] = true;
-  
+  //randomise();  // initialise board1
+  board_cur[50][50] = true;
+  board_cur[50][51] = true;
+  board_cur[50][52] = true;
+  board_cur[51][50] = true;
+  board_cur[49][51] = true;
+
   // copy into board2
   arrCopy(board_prev, board_cur);
-  //for (int i = 0; i < board1.length; i++)
-  //{
-  //  board2[i] = board1[i].clone();
-  //}
-  
 }
 
 float cellWidth;
@@ -38,35 +26,12 @@ int colCount = 100;
 boolean[][] board_cur = new boolean[rowCount][colCount];
 boolean[][] board_prev = new boolean[rowCount][colCount];
 
+boolean pause = false;
+
 void draw()
 {
-  // update the board
-  for (int i = 0; i < rowCount; i++)
-  {
-    for (int j = 0; j < colCount; j++)
-    {
-      int numAlive = countLiveCells(i,j);
-      // if cell is alive
-      if (getCell(i,j))
-      {
-        if (numAlive < 2 || numAlive > 3)
-        {
-          setCell(i,j,false);
-        }
-      }
-      else
-      {
-        if (numAlive == 3)
-        {
-          setCell(i,j,true);
-        }
-      }
-    }
-  }
-  
-  // update the previous version to be the same as the current
-  arrCopy(board_prev, board_cur);
-  // draw the board
+  // draw the board's current iteration
+  // at this point board_cur and board_prev are the same
   background(0);
   for (int i = 0; i < rowCount; i++)
   {
@@ -84,11 +49,56 @@ void draw()
     }
   }
 
-  // flip the board pointers
-  boolean[][] temp;
-  temp = board_cur;
-  board_cur = board_prev;
-  board_prev = temp;
+  // only update simulation if the game isn't paused
+  // this updates board_cur based on board_prev's values
+  if (!pause)
+  {
+    // update the board
+    for (int i = 0; i < rowCount; i++)
+    {
+      for (int j = 0; j < colCount; j++)
+      {
+        int numAlive = countLiveCells(i, j);
+        // check if cell is alive in previous iteration
+        if (getCell(i, j))
+        {
+          if (numAlive < 2 || numAlive > 3)
+          {
+            setCell(i, j, false);
+          }
+        } else
+        {
+          if (numAlive == 3)
+          {
+            setCell(i, j, true);
+          }
+        }
+      }
+    }
+  }
+
+  // copy board_cur into board_prev
+  arrCopy(board_prev, board_cur);
+}
+
+void keyPressed()
+{
+  switch(key)
+  {
+  case 'p':
+    pause = !pause;
+    break;
+  case 'r':
+    randomise();
+    break;
+  case 'c':
+    clear();
+    break;
+  }
+}
+
+void mousePressed()
+{
 }
 
 // updates the cells in the current version of the board
@@ -146,9 +156,11 @@ void randomise()
       if ((int)random(0, 2) == 1)
       {
         board_cur[i][j] = true;
+        board_prev[i][j] = true;
       } else
       {
         board_cur[i][j] = false;
+        board_prev[i][j] = false;
       }
     }
   }
@@ -161,6 +173,18 @@ void arrCopy(boolean[][] dest, boolean[][] src)
     for (int j = 0; j < dest[0].length; j++)
     {
       dest[i][j] = src[i][j];
+    }
+  }
+}
+
+void clear()
+{
+  for (int i = 0; i < board_prev.length; i++)
+  {
+    for (int j = 0; j < board_prev.length; j++)
+    {
+      board_prev[i][j] = false;
+      board_cur[i][j] = false;
     }
   }
 }
