@@ -2,6 +2,7 @@
 // Controls:
 //   clear screen:     <c>
 //   randomise cells:  <r>
+//   original state:   <o>
 //   pause simulation: <p>
 
 void setup()
@@ -12,15 +13,12 @@ void setup()
   stroke(255);
   strokeWeight(0.1);
   frameRate(60);
+  gameSpeed = 10;  // lower is faster
 
   //randomise();  // initialise board1 in a random state
-  
+
   // Initialise a simple pattern
-  board_cur[50][50] = true;
-  board_cur[50][51] = true;
-  board_cur[50][52] = true;
-  board_cur[51][50] = true;
-  board_cur[49][51] = true;
+  original();
 
   // copy into board2
   arrCopy(board_prev, board_cur);
@@ -35,6 +33,7 @@ boolean[][] board_cur = new boolean[rowCount][colCount];
 boolean[][] board_prev = new boolean[rowCount][colCount];
 
 boolean pause = false;
+int gameSpeed;
 
 void draw()
 {
@@ -59,26 +58,29 @@ void draw()
 
   // only update simulation if the game isn't paused
   // this updates board_cur based on board_prev's values
-  if (!pause)
+  if (frameCount % gameSpeed == 0)
   {
-    // update the board
-    for (int i = 0; i < rowCount; i++)
+    if (!pause)
     {
-      for (int j = 0; j < colCount; j++)
+      // update the board
+      for (int i = 0; i < rowCount; i++)
       {
-        int numAlive = countLiveCells(i, j);
-        // check if cell is alive in previous iteration
-        if (getCell(i, j))
+        for (int j = 0; j < colCount; j++)
         {
-          if (numAlive < 2 || numAlive > 3)
+          int numAlive = countLiveCells(i, j);
+          // check if cell is alive in previous iteration
+          if (getCell(i, j))
           {
-            setCell(i, j, false);
-          }
-        } else
-        {
-          if (numAlive == 3)
+            if (numAlive < 2 || numAlive > 3)
+            {
+              setCell(i, j, false);
+            }
+          } else
           {
-            setCell(i, j, true);
+            if (numAlive == 3)
+            {
+              setCell(i, j, true);
+            }
           }
         }
       }
@@ -102,6 +104,9 @@ void keyPressed()
     break;
   case 'c':
     clear();
+    break;
+  case 'o':
+    original();
     break;
   }
 }
@@ -170,6 +175,16 @@ void randomise()
       }
     }
   }
+}
+
+void original()
+{
+  clear();
+  board_cur[50][50] = true;
+  board_cur[50][51] = true;
+  board_cur[50][52] = true;
+  board_cur[51][50] = true;
+  board_cur[49][51] = true;
 }
 
 // copy contents of one 2d array into another
